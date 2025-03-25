@@ -10,11 +10,12 @@ function App() {
   const [copiedId, setCopiedId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isConsoleOpen, setIsConsoleOpen] = useState(false);
+  const [useDefaultFile, setUseDefaultFile] = useState(false);
   const [favorites, setFavorites] = useState(() => {
     const savedFavorites = localStorage.getItem('favorites');
     return savedFavorites ? JSON.parse(savedFavorites) : [];
   });
-  
+
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode');
     if (savedMode !== null) {
@@ -31,6 +32,19 @@ function App() {
     }
   }, [isDarkMode]);
 
+  const loadDefaultItems = async () => {
+    try {
+      const response = await fetch(`${process.env.PUBLIC_URL}/Items.json`);
+      const data = await response.json();
+      setItems(data);
+      setSelectedCategory('All');
+      setUseDefaultFile(true);
+    } catch (error) {
+      console.error('Error loading default items:', error);
+      alert('Error loading default items');
+    }
+  };
+
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -41,6 +55,7 @@ function App() {
         const data = JSON.parse(e.target.result);
         setItems(data);
         setSelectedCategory('All');
+        setUseDefaultFile(false);
       } catch (error) {
         alert('Error reading JSON file');
       }
@@ -230,6 +245,17 @@ function App() {
         {/* Controls Section */}
         <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mb-8`}>
           <div className="flex flex-wrap gap-4 mb-4">
+            <button
+              onClick={loadDefaultItems}
+              className={`px-4 py-2 rounded-md ${
+                isDarkMode 
+                  ? 'bg-blue-600 hover:bg-blue-700' 
+                  : 'bg-blue-500 hover:bg-blue-600'
+              } text-white transition-colors`}
+            >
+              Use Default Items
+            </button>
+
             <input
               type="file"
               accept=".json"
@@ -278,6 +304,12 @@ function App() {
               isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
             } border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}
           />
+          
+          {useDefaultFile && (
+            <div className={`mt-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              Using default Items.json
+            </div>
+          )}
         </div>
 
         {/* Favorites Section */}
