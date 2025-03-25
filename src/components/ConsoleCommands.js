@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 
 const CommandSection = ({ title, children, isDarkMode }) => (
   <div className={`mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -12,48 +12,57 @@ const CommandSection = ({ title, children, isDarkMode }) => (
 const ConsoleCommands = ({ isDarkMode }) => {
   const [selectedStat, setSelectedStat] = useState('health');
   const [statValue, setStatValue] = useState(100);
-  const [copiedId, setCopiedId] = useState(null);
+  const [copiedCommand, setCopiedCommand] = useState(false);
 
-  const zeroDefaultStats = useMemo(() => [
-    'hunger',
-    'thirst',
-    'tiredness',
-    'bladder',
-    'depression',
-    'alchohol_need',
-    'mushroom_need',
-    'smoking_need'
-  ], []);
-
-  const vitalStats = useMemo(() => [
+  const vitalStats = [
     { id: 'health', label: 'Health' },
     { id: 'hunger', label: 'Hunger' },
     { id: 'thirst', label: 'Thirst' },
     { id: 'tiredness', label: 'Tiredness' },
     { id: 'hygiene', label: 'Hygiene' }
-  ], []);
+  ];
 
-  const needStats = useMemo(() => [
+  const needStats = [
     { id: 'bladder', label: 'Bladder' },
     { id: 'depression', label: 'Depression' },
     { id: 'alchohol_need', label: 'Alcohol Need' },
     { id: 'mushroom_need', label: 'Mushroom Need' },
     { id: 'smoking_need', label: 'Smoking Need' }
-  ], []);
+  ];
 
-  useEffect(() => {
-    setStatValue(zeroDefaultStats.includes(selectedStat) ? 0 : 100);
-  }, [selectedStat, zeroDefaultStats]);
-
-  const handleCopyCommand = (command, id) => {
-    navigator.clipboard.writeText(command);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopyCommand = async (command) => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(command);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = command;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        
+        try {
+          document.execCommand('copy');
+        } catch (err) {
+          console.error('Fallback copy failed:', err);
+        }
+        
+        document.body.removeChild(textarea);
+      }
+      
+      setCopiedCommand(true);
+      setTimeout(() => setCopiedCommand(false), 2000);
+    } catch (err) {
+      console.error('Copy failed:', err);
+      alert('Unable to copy command. Please try manually selecting and copying the text.');
+    }
   };
 
   const handleStatCommand = () => {
     const command = `player_stats ${selectedStat} set ${statValue}`;
-    handleCopyCommand(command, 'stat_command');
+    handleCopyCommand(command);
   };
 
   return (
@@ -88,7 +97,7 @@ const ConsoleCommands = ({ isDarkMode }) => {
 
           <div className="flex flex-col space-y-2">
             <label className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>Value</label>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <input
                 type="number"
                 value={statValue}
@@ -100,7 +109,7 @@ const ConsoleCommands = ({ isDarkMode }) => {
                   isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
                 }`}
               />
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {[0, 25, 50, 75, 100].map((num) => (
                   <button
                     key={num}
@@ -131,45 +140,41 @@ const ConsoleCommands = ({ isDarkMode }) => {
           <button
             onClick={handleStatCommand}
             className={`w-full p-3 rounded-md font-medium transition-colors ${
-              copiedId === 'stat_command'
+              copiedCommand
                 ? 'bg-green-500 text-white'
                 : isDarkMode
                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
                 : 'bg-blue-500 hover:bg-blue-600 text-white'
             }`}
           >
-            {copiedId === 'stat_command' ? 'Copied!' : 'Copy Command'}
+            {copiedCommand ? 'Copied!' : 'Copy Command'}
           </button>
         </div>
       </CommandSection>
 
       <CommandSection title="God Mode" isDarkMode={isDarkMode}>
         <button
-          onClick={() => handleCopyCommand('god_mode', 'god_mode')}
-          className={`w-full p-3 rounded-md font-medium transition-colors ${
-            copiedId === 'god_mode'
-              ? 'bg-green-500 text-white'
-              : isDarkMode
+          onClick={() => handleCopyCommand('god_mode')}
+          className={`w-full p-3 rounded-md ${
+            isDarkMode
               ? 'bg-gray-700 hover:bg-gray-600 text-white'
               : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
           }`}
         >
-          {copiedId === 'god_mode' ? 'Copied!' : 'god_mode'}
+          god_mode
         </button>
       </CommandSection>
 
       <CommandSection title="No Clip" isDarkMode={isDarkMode}>
         <button
-          onClick={() => handleCopyCommand('noclip', 'noclip')}
-          className={`w-full p-3 rounded-md font-medium transition-colors ${
-            copiedId === 'noclip'
-              ? 'bg-green-500 text-white'
-              : isDarkMode
+          onClick={() => handleCopyCommand('noclip')}
+          className={`w-full p-3 rounded-md ${
+            isDarkMode
               ? 'bg-gray-700 hover:bg-gray-600 text-white'
               : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
           }`}
         >
-          {copiedId === 'noclip' ? 'Copied!' : 'noclip'}
+          noclip
         </button>
       </CommandSection>
     </div>

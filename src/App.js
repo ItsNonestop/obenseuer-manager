@@ -63,10 +63,36 @@ function App() {
     reader.readAsText(file);
   };
 
-  const handleCopyCommand = (id, amount = 1) => {
-    navigator.clipboard.writeText(`add_item ${id} ${amount}`);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopyCommand = async (id, amount = 1) => {
+    const commandText = `add_item ${id} ${amount}`;
+    
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(commandText);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = commandText;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        
+        try {
+          document.execCommand('copy');
+        } catch (err) {
+          console.error('Fallback copy failed:', err);
+        }
+        
+        document.body.removeChild(textarea);
+      }
+      
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error('Copy failed:', err);
+      alert('Unable to copy command. Please try manually selecting and copying the text.');
+    }
   };
 
   const toggleFavorite = (itemId) => {
@@ -107,7 +133,7 @@ function App() {
 
     return (
       <div 
-        className={`rounded-lg shadow-md p-6 transition-all duration-200 flex flex-col ${
+        className={`rounded-lg shadow-md p-4 sm:p-6 transition-all duration-200 flex flex-col ${
           isDarkMode ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white hover:shadow-lg'
         }`}
       >
@@ -151,7 +177,7 @@ function App() {
             isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
           }`}>
             <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <input
                   type="number"
                   value={itemAmount}
@@ -159,12 +185,12 @@ function App() {
                     const value = parseInt(e.target.value);
                     if (!isNaN(value) && value >= 1) setItemAmount(value);
                   }}
-                  className={`w-24 p-2 rounded-md ${
+                  className={`w-20 p-2 rounded-md ${
                     isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
                   }`}
                   min="1"
                 />
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {[1, 10, 50, 100].map((num) => (
                     <button
                       key={num}
@@ -215,10 +241,10 @@ function App() {
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
-      <div className="max-w-7xl mx-auto p-8">
+      <div className="max-w-7xl mx-auto p-4 sm:p-8">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+          <h1 className={`text-2xl sm:text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             Obenseuer Items Manager
           </h1>
           <div className="flex items-center gap-4">
@@ -243,8 +269,8 @@ function App() {
         </div>
 
         {/* Controls Section */}
-        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mb-8`}>
-          <div className="flex flex-wrap gap-4 mb-4">
+        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-4 sm:p-6 mb-8`}>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-4">
             <button
               onClick={loadDefaultItems}
               className={`px-4 py-2 rounded-md ${
@@ -318,7 +344,7 @@ function App() {
             <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
               Favorites
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
               {items
                 .filter(item => favorites.includes(item.ID))
                 .map((item) => (
@@ -330,7 +356,7 @@ function App() {
         )}
 
         {/* Main Items Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredAndSortedItems.map((item) => (
             <ItemCard key={item.ID} item={item} />
           ))}
