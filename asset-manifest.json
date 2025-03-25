@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/obenseuer-manager/static/css/main.172f07d6.css",
-    "main.js": "/obenseuer-manager/static/js/main.1264afc2.js",
+    "main.css": "/obenseuer-manager/static/css/main.feb9895e.css",
+    "main.js": "/obenseuer-manager/static/js/main.7f2c7c7e.js",
     "static/js/453.0eb771bb.chunk.js": "/obenseuer-manager/static/js/453.0eb771bb.chunk.js",
     "index.html": "/obenseuer-manager/index.html",
-    "main.172f07d6.css.map": "/obenseuer-manager/static/css/main.172f07d6.css.map",
-    "main.1264afc2.js.map": "/obenseuer-manager/static/js/main.1264afc2.js.map",
+    "main.feb9895e.css.map": "/obenseuer-manager/static/css/main.feb9895e.css.map",
+    "main.7f2c7c7e.js.map": "/obenseuer-manager/static/js/main.7f2c7c7e.js.map",
     "453.0eb771bb.chunk.js.map": "/obenseuer-manager/static/js/453.0eb771bb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.172f07d6.css",
-    "static/js/main.1264afc2.js"
+    "static/css/main.feb9895e.css",
+    "static/js/main.7f2c7c7e.js"
   ]
 }
