@@ -1,46 +1,37 @@
 # Obenseuer Manager
 
-A web utility for managing Obenseuer game items and console commands. This tool simplifies the process of retrieving item commands and managing player stats.
+A web-based tool for Obenseuer game item management and commands.
 
-## Features
+## 🎮 Quick Start
 
-- **Item Management**
-  - Search and filter items
-  - Copy item commands (`add_item`) with correct formatting
-  - Categorized item display
-  - Favorite items system
+**Visit the live site: [Obenseuer Manager](https://itsnonestop.github.io/obenseuer-manager)**
 
-- **Player Stats Management**
-  - Modify vital stats (Health, Hunger, Thirst, etc.)
-  - Adjust addiction levels
-  - Quick value presets (0, 25, 50, 75, 100)
+### How to Use
 
-- **Game Commands**
-  - God Mode toggle
-  - No Clip toggle
+1. Visit the website
+2. Click "Choose file" to upload your `Items.json`
+3. Start searching and using item commands!
 
-## How to Use
+## ✨ Features
 
-1. **Items**
-   - Upload your `Items.json` file
-   - Search for items using the search bar
-   - Click categories to filter items
-   - Click the copy button to copy item commands
-   - Star items to add them to favorites
+- **Search Items**: Find any item quickly
+- **Copy Commands**: One-click copy for item commands
+- **Filter by Category**: Click category tags to filter items
+- **Dark/Light Mode**: Choose your preferred theme
 
-2. **Player Stats**
-   - Select a stat from the dropdown
-   - Use preset values or enter custom amounts
-   - Copy and paste commands into the game
+## 📝 Item Commands
+The tool automatically formats commands:
+- `add_item [ID]` - Adds 1 of the item
+- `add_item [ID] [Amount]` - Adds specific amount
 
-## Installation
+## 💡 Tips
+- Click category tags to filter items
+- Click tags again to remove filter
+- Use the search bar for quick item finding
+- Toggle dark/light mode for your preference
 
-```bash
-# Clone the repository
-git clone https://github.com/ItsNonestop/obenseuer-manager.git
+## 🔄 Updates
+Check back regularly for new features and improvements!
 
-# Install dependencies
-npm install
-
-# Start the development server
-npm start
+## 🐛 Issues or Suggestions
+Found a bug or have a suggestion? [Open an issue](https://github.com/ItsNonestop/obenseuer-manager/issues)
