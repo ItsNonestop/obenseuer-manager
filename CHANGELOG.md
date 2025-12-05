@@ -1,5 +1,10 @@
 # Changelog
 
+## [v3.0.0] - Major UI Overhaul
+### Changed
+- Changed Items.json file to latest game version (05/12/2025)
+- Complete UI resign with attempt to match Obenseuer's font
+
 ## [v2.0.0] - 2024-03-25
 ### Added
 - Default Items.json support
