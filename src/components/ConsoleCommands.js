@@ -10,9 +10,23 @@ const CommandSection = ({ title, children }) => (
   </div>
 );
 
+const defaultStatValues = {
+  health: 100,
+  hunger: 0,
+  thirst: 0,
+  tiredness: 0,
+  hygiene: 100,
+  bladder: 0,
+  depression: 0,
+  alchohol_need: 0,
+  mushroom_need: 0,
+  smoking_need: 0,
+  gambling_need: 0
+};
+
 const ConsoleCommands = () => {
   const [selectedStat, setSelectedStat] = useState('health');
-  const [statValue, setStatValue] = useState(100);
+  const [statValue, setStatValue] = useState(defaultStatValues.health);
   const [copiedCommand, setCopiedCommand] = useState(false);
 
   const vitalStats = [
@@ -28,7 +42,8 @@ const ConsoleCommands = () => {
     { id: 'depression', label: 'Depression' },
     { id: 'alchohol_need', label: 'Alcohol Need' },
     { id: 'mushroom_need', label: 'Mushroom Need' },
-    { id: 'smoking_need', label: 'Smoking Need' }
+    { id: 'smoking_need', label: 'Smoking Need' },
+    { id: 'gambling_need', label: 'Gambling Need' }
   ];
 
   const handleCopyCommand = async (command) => {
@@ -61,6 +76,11 @@ const ConsoleCommands = () => {
     }
   };
 
+  const handleStatChange = (newStat) => {
+    setSelectedStat(newStat);
+    setStatValue(defaultStatValues[newStat] ?? 0);
+  };
+
   const handleStatCommand = () => {
     const command = `player_stats ${selectedStat} set ${statValue}`;
     handleCopyCommand(command);
@@ -81,7 +101,7 @@ const ConsoleCommands = () => {
             <label className="eyebrow text-xs">Select Stat</label>
             <select
               value={selectedStat}
-              onChange={(e) => setSelectedStat(e.target.value)}
+              onChange={(e) => handleStatChange(e.target.value)}
               className="w-full input-field"
             >
               <optgroup label="Vital Stats">
