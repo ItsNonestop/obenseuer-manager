@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/obenseuer-manager/static/css/main.feb9895e.css",
-    "main.js": "/obenseuer-manager/static/js/main.7f2c7c7e.js",
-    "static/js/453.0eb771bb.chunk.js": "/obenseuer-manager/static/js/453.0eb771bb.chunk.js",
+    "main.css": "/obenseuer-manager/static/css/main.981c69c3.css",
+    "main.js": "/obenseuer-manager/static/js/main.4cfce22f.js",
+    "static/js/453.2b4be617.chunk.js": "/obenseuer-manager/static/js/453.2b4be617.chunk.js",
     "index.html": "/obenseuer-manager/index.html",
-    "main.feb9895e.css.map": "/obenseuer-manager/static/css/main.feb9895e.css.map",
-    "main.7f2c7c7e.js.map": "/obenseuer-manager/static/js/main.7f2c7c7e.js.map",
-    "453.0eb771bb.chunk.js.map": "/obenseuer-manager/static/js/453.0eb771bb.chunk.js.map"
+    "main.981c69c3.css.map": "/obenseuer-manager/static/css/main.981c69c3.css.map",
+    "main.4cfce22f.js.map": "/obenseuer-manager/static/js/main.4cfce22f.js.map",
+    "453.2b4be617.chunk.js.map": "/obenseuer-manager/static/js/453.2b4be617.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.feb9895e.css",
-    "static/js/main.7f2c7c7e.js"
+    "static/css/main.981c69c3.css",
+    "static/js/main.4cfce22f.js"
   ]
 }
