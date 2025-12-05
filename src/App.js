@@ -65,7 +65,7 @@ function App() {
 
   const handleCopyCommand = async (id, amount = 1) => {
     const commandText = `add_item ${id} ${amount}`;
-    
+
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(commandText);
@@ -77,16 +77,16 @@ function App() {
         document.body.appendChild(textarea);
         textarea.focus();
         textarea.select();
-        
+
         try {
           document.execCommand('copy');
         } catch (err) {
           console.error('Fallback copy failed:', err);
         }
-        
+
         document.body.removeChild(textarea);
       }
-      
+
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
@@ -96,25 +96,25 @@ function App() {
   };
 
   const toggleFavorite = (itemId) => {
-    setFavorites(prev => {
+    setFavorites((prev) => {
       const newFavorites = prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
+        ? prev.filter((id) => id !== itemId)
         : [...prev, itemId];
       localStorage.setItem('favorites', JSON.stringify(newFavorites));
       return newFavorites;
     });
   };
 
-  const uniqueCategories = [...new Set(items.flatMap(item => item.Categories || []))].sort();
+  const uniqueCategories = [...new Set(items.flatMap((item) => item.Categories || []))].sort();
   const allCategories = ['All', ...uniqueCategories];
 
   const getCategoryCount = (category) => {
     if (category === 'All') return items.length;
-    return items.filter(item => item.Categories?.includes(category)).length;
+    return items.filter((item) => item.Categories?.includes(category)).length;
   };
 
   const filteredAndSortedItems = items
-    .filter(item => {
+    .filter((item) => {
       const matchesSearch = item.Title?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || item.Categories?.includes(selectedCategory);
       return matchesSearch && matchesCategory;
@@ -130,155 +130,136 @@ function App() {
 
   const ItemCard = ({ item }) => {
     const [itemAmount, setItemAmount] = useState(1);
+    const formattedId = item.ID?.toString().padStart(3, '0');
 
     return (
-      <div 
-        className={`rounded-lg shadow-md p-4 sm:p-6 transition-all duration-200 flex flex-col ${
-          isDarkMode ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white hover:shadow-lg'
-        }`}
-      >
-        <div className="flex justify-between items-start mb-3">
-          <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-            {item.Title}
-          </h2>
+      <div className="panel card p-4 sm:p-6 flex flex-col gap-4">
+        <div className="flex justify-between items-start gap-3">
+          <div className="space-y-1">
+            <p className="eyebrow text-xs">ID #{formattedId}</p>
+            <h2 className="text-xl font-semibold heading-compact">{item.Title}</h2>
+          </div>
           <button
             onClick={() => toggleFavorite(item.ID)}
-            className={`p-1 rounded-full transition-colors text-xl ${
-              isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-            }`}
+            className={`icon-button ${favorites.includes(item.ID) ? 'active' : ''}`}
+            aria-label={favorites.includes(item.ID) ? 'Remove from favorites' : 'Add to favorites'}
           >
-            {favorites.includes(item.ID) ? '⭐' : '★'}
+            {favorites.includes(item.ID) ? '★' : '☆'}
           </button>
         </div>
-        
-        <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-          {item.Description}
+
+        <p className="text-sm leading-relaxed muted">
+          {item.Description || 'No description available.'}
         </p>
 
-        <div className="flex flex-wrap gap-2 mb-4 min-h-[60px]">
-          {item.Categories?.map((category, idx) => (
-            <span 
-              key={idx}
-              className={`text-xs px-2 py-1 rounded-full transition-colors duration-200 h-fit ${
-                category === selectedCategory ?
-                  (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') :
-                  (isDarkMode ? 'bg-blue-900 text-blue-100 hover:bg-blue-800' : 'bg-blue-100 text-blue-800 hover:bg-blue-200')
-              }`}
-              onClick={() => setSelectedCategory(category === selectedCategory ? 'All' : category)}
-              style={{ cursor: 'pointer' }}
-            >
-              {category}
-            </span>
-          ))}
-        </div>
+        {item.Categories?.length > 0 && (
+          <div className="flex flex-wrap gap-2 min-h-[48px]">
+            {item.Categories.map((category, idx) => (
+              <span
+                key={`${category}-${idx}`}
+                className={`chip ${category === selectedCategory ? 'is-active' : ''}`}
+                onClick={() => setSelectedCategory(category === selectedCategory ? 'All' : category)}
+                role="button"
+                tabIndex={0}
+              >
+                {category}
+              </span>
+            ))}
+          </div>
+        )}
 
-        <div className="mt-auto">
-          <div className={`mb-4 rounded p-3 ${
-            isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
-          }`}>
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <input
-                  type="number"
-                  value={itemAmount}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    if (!isNaN(value) && value >= 1) setItemAmount(value);
-                  }}
-                  className={`w-20 p-2 rounded-md ${
-                    isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                  }`}
-                  min="1"
-                />
-                <div className="flex flex-wrap gap-2">
-                  {[1, 10, 50, 100].map((num) => (
-                    <button
-                      key={num}
-                      onClick={() => setItemAmount(num)}
-                      className={`px-3 py-1 rounded ${
-                        itemAmount === num
-                          ? isDarkMode
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-blue-500 text-white'
-                          : isDarkMode
-                          ? 'bg-gray-700 text-gray-300'
-                          : 'bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <code className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                  add_item {item.ID} {itemAmount}
-                </code>
+        <div className="panel panel-strong p-3 rounded-xl space-y-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <input
+              type="number"
+              value={itemAmount}
+              onChange={(e) => {
+                const value = parseInt(e.target.value, 10);
+                if (!Number.isNaN(value) && value >= 1) setItemAmount(value);
+              }}
+              className="input-field w-24"
+              min="1"
+            />
+            <div className="flex flex-wrap gap-2">
+              {[1, 10, 50, 100].map((num) => (
                 <button
-                  onClick={() => handleCopyCommand(item.ID, itemAmount)}
-                  className={`px-4 py-1 rounded-md transition-all duration-200 ${
-                    copiedId === item.ID ?
-                      'bg-green-500 text-white' :
-                      isDarkMode ?
-                        'bg-blue-600 text-white hover:bg-blue-700' :
-                        'bg-blue-500 text-white hover:bg-blue-600'
-                  }`}
+                  key={num}
+                  onClick={() => setItemAmount(num)}
+                  className={`chip ${itemAmount === num ? 'is-active' : ''}`}
                 >
-                  {copiedId === item.ID ? 'Copied!' : 'Copy'}
+                  {num}
                 </button>
-              </div>
+              ))}
             </div>
           </div>
-
-          <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            <span>Value: {item.Value}</span>
-            {item.Stackable && <span className="ml-4">Stack: {item.Stackable}</span>}
+          <div className="flex flex-wrap items-center gap-3 justify-between">
+            <code className="command-code">add_item {item.ID} {itemAmount}</code>
+            <button
+              onClick={() => handleCopyCommand(item.ID, itemAmount)}
+              className={`btn-accent ${copiedId === item.ID ? 'is-success' : ''}`}
+            >
+              {copiedId === item.ID ? 'Copied' : 'Copy Command'}
+            </button>
           </div>
+        </div>
+
+        <div className="flex items-center gap-3 flex-wrap text-sm">
+          <span className="stat-pill">
+            Value <strong className="text-[var(--text)]">{item.Value}</strong>
+          </span>
+          {item.Stackable && (
+            <span className="stat-pill">
+              Stack <strong className="text-[var(--text)]">{item.Stackable}</strong>
+            </span>
+          )}
         </div>
       </div>
     );
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
-      <div className="max-w-7xl mx-auto p-4 sm:p-8">
-        {/* Header Section */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className={`text-2xl sm:text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-            Obenseuer Items Manager
-          </h1>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsConsoleOpen(true)}
-              className={`p-2 rounded-lg ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
-              } hover:opacity-80 transition-opacity`}
-              title="Console Commands"
-            >
-              &gt;_
-            </button>
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className={`p-2 rounded-lg ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
-              }`}
-            >
-              {isDarkMode ? '☀️ Light' : '🌙 Dark'}
-            </button>
+    <div className="app-shell">
+      <div className="noise-overlay" aria-hidden="true" />
+      <div className="relative z-10 max-w-7xl mx-auto p-4 sm:p-8 space-y-8">
+        <header className="space-y-3">
+          <div className="hud-bar">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl border border-[var(--stroke)] bg-[var(--panel-strong)] flex items-center justify-center text-lg heading-compact shadow-inner">
+                OS
+              </div>
+              <div>
+                <p className="eyebrow text-xs">Obenseuer / Items</p>
+                <h1 className="text-2xl sm:text-3xl heading-brand">Obenseuer Item Manager</h1>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+              <div className="hud-pill">
+                Items <span>{items.length || '—'}</span>
+              </div>
+              <div className="hud-pill">
+                Favorites <span>{favorites.length}</span>
+              </div>
+              <button onClick={() => setIsConsoleOpen(true)} className="btn-ghost whitespace-nowrap">
+                &gt;_ Console
+              </button>
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="icon-button"
+                aria-label="Toggle theme"
+              >
+                {isDarkMode ? '☾' : '☀'}
+              </button>
+            </div>
           </div>
-        </div>
+          <p className="subtitle text-sm sm:text-base max-w-3xl">
+            Styled to echo the damp, neon grit of Obenseuer. Load Items.json, browse by category, and copy spawn
+            commands without leaving the vibe of the sewers.
+          </p>
+        </header>
 
-        {/* Controls Section */}
-        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-4 sm:p-6 mb-8`}>
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-4">
-            <button
-              onClick={loadDefaultItems}
-              className={`px-4 py-2 rounded-md ${
-                isDarkMode 
-                  ? 'bg-blue-600 hover:bg-blue-700' 
-                  : 'bg-blue-500 hover:bg-blue-600'
-              } text-white transition-colors`}
-            >
+        <section className="panel p-4 sm:p-6 space-y-4">
+          <div className="flex flex-col md:flex-row flex-wrap gap-3">
+            <button onClick={loadDefaultItems} className="btn-accent whitespace-nowrap">
               Use Default Items
             </button>
 
@@ -286,21 +267,13 @@ function App() {
               type="file"
               accept=".json"
               onChange={handleFileUpload}
-              className={`block text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                ${isDarkMode ? 
-                  'file:bg-blue-600 file:text-white hover:file:bg-blue-700' : 
-                  'file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'}`}
+              className="input-field file-input text-sm"
             />
-            
+
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className={`px-4 py-2 rounded-md ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-              }`}
+              className="input-field"
             >
               <option value="id">Sort by ID</option>
               <option value="title">Sort by Title</option>
@@ -309,66 +282,63 @@ function App() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className={`px-4 py-2 rounded-md ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-              }`}
+              className="input-field"
             >
-              {allCategories.map(category => (
+              {allCategories.map((category) => (
                 <option key={category} value={category}>
                   {category} ({getCategoryCount(category)})
                 </option>
               ))}
             </select>
           </div>
-          
+
           <input
             type="text"
             placeholder="Search items..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={`w-full p-2 rounded-md ${
-              isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-            } border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}
+            className="input-field w-full"
           />
-          
-          {useDefaultFile && (
-            <div className={`mt-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              Using default Items.json
-            </div>
-          )}
-        </div>
 
-        {/* Favorites Section */}
+          {useDefaultFile && <div className="hud-pill w-fit">Using default Items.json</div>}
+        </section>
+
         {favorites.length > 0 && (
-          <>
-            <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-              Favorites
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+          <section className="space-y-4">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-semibold heading-compact">Favorites</h2>
+              <div className="divider flex-1" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {items
-                .filter(item => favorites.includes(item.ID))
+                .filter((item) => favorites.includes(item.ID))
                 .map((item) => (
                   <ItemCard key={item.ID} item={item} />
                 ))}
             </div>
-            <div className={`w-full h-px mb-8 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
-          </>
+          </section>
         )}
 
-        {/* Main Items Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {filteredAndSortedItems.map((item) => (
-            <ItemCard key={item.ID} item={item} />
-          ))}
-        </div>
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-semibold heading-compact">All Items</h2>
+            <div className="divider flex-1" />
+          </div>
+          {filteredAndSortedItems.length === 0 ? (
+            <div className="panel p-6 text-center muted">
+              No items match your filters yet. Load Items.json or adjust search and category filters.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {filteredAndSortedItems.map((item) => (
+                <ItemCard key={item.ID} item={item} />
+              ))}
+            </div>
+          )}
+        </section>
 
-        {/* Console Commands Modal */}
-        <Modal
-          isOpen={isConsoleOpen}
-          onClose={() => setIsConsoleOpen(false)}
-          isDarkMode={isDarkMode}
-        >
-          <ConsoleCommands isDarkMode={isDarkMode} />
+        <Modal isOpen={isConsoleOpen} onClose={() => setIsConsoleOpen(false)}>
+          <ConsoleCommands />
         </Modal>
       </div>
     </div>

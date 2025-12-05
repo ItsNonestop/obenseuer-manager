@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 
-const CommandSection = ({ title, children, isDarkMode }) => (
-  <div className={`mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-    <h3 className="text-xl font-bold mb-4">{title}</h3>
-    <div className="space-y-4">
-      {children}
+const CommandSection = ({ title, children }) => (
+  <div className="panel panel-strong p-4 sm:p-5 space-y-4">
+    <div className="flex items-center gap-3">
+      <h3 className="text-lg font-semibold heading-compact">{title}</h3>
+      <div className="divider flex-1" />
     </div>
+    {children}
   </div>
 );
 
-const ConsoleCommands = ({ isDarkMode }) => {
+const ConsoleCommands = () => {
   const [selectedStat, setSelectedStat] = useState('health');
   const [statValue, setStatValue] = useState(100);
   const [copiedCommand, setCopiedCommand] = useState(false);
@@ -42,16 +43,16 @@ const ConsoleCommands = ({ isDarkMode }) => {
         document.body.appendChild(textarea);
         textarea.focus();
         textarea.select();
-        
+
         try {
           document.execCommand('copy');
         } catch (err) {
           console.error('Fallback copy failed:', err);
         }
-        
+
         document.body.removeChild(textarea);
       }
-      
+
       setCopiedCommand(true);
       setTimeout(() => setCopiedCommand(false), 2000);
     } catch (err) {
@@ -67,28 +68,29 @@ const ConsoleCommands = ({ isDarkMode }) => {
 
   return (
     <div className="space-y-6">
-      <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-        Console Commands
-      </h2>
+      <div className="space-y-1">
+        <h2 className="text-2xl font-semibold heading-brand">Console Commands</h2>
+        <p className="subtitle text-sm">
+          Tap a preset or assemble custom stat changes, then copy straight to your in-game console.
+        </p>
+      </div>
 
-      <CommandSection title="Player Stats" isDarkMode={isDarkMode}>
+      <CommandSection title="Player Stats">
         <div className="space-y-4">
           <div className="flex flex-col space-y-2">
-            <label className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>Select Stat</label>
+            <label className="eyebrow text-xs">Select Stat</label>
             <select
               value={selectedStat}
               onChange={(e) => setSelectedStat(e.target.value)}
-              className={`w-full p-2 rounded-md ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-              }`}
+              className="w-full input-field"
             >
               <optgroup label="Vital Stats">
-                {vitalStats.map(stat => (
+                {vitalStats.map((stat) => (
                   <option key={stat.id} value={stat.id}>{stat.label}</option>
                 ))}
               </optgroup>
               <optgroup label="Need Stats">
-                {needStats.map(stat => (
+                {needStats.map((stat) => (
                   <option key={stat.id} value={stat.id}>{stat.label}</option>
                 ))}
               </optgroup>
@@ -96,33 +98,23 @@ const ConsoleCommands = ({ isDarkMode }) => {
           </div>
 
           <div className="flex flex-col space-y-2">
-            <label className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>Value</label>
+            <label className="eyebrow text-xs">Value</label>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <input
                 type="number"
                 value={statValue}
                 onChange={(e) => {
-                  const value = parseInt(e.target.value);
-                  if (!isNaN(value)) setStatValue(value);
+                  const value = parseInt(e.target.value, 10);
+                  if (!Number.isNaN(value)) setStatValue(value);
                 }}
-                className={`w-24 p-2 rounded-md ${
-                  isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                }`}
+                className="w-24 input-field"
               />
               <div className="flex flex-wrap gap-2">
                 {[0, 25, 50, 75, 100].map((num) => (
                   <button
                     key={num}
                     onClick={() => setStatValue(num)}
-                    className={`px-3 py-1 rounded ${
-                      statValue === num
-                        ? isDarkMode
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-blue-500 text-white'
-                        : isDarkMode
-                        ? 'bg-gray-700 text-gray-300'
-                        : 'bg-gray-200 text-gray-700'
-                    }`}
+                    className={`chip ${statValue === num ? 'is-active' : ''}`}
                   >
                     {num}
                   </button>
@@ -131,51 +123,36 @@ const ConsoleCommands = ({ isDarkMode }) => {
             </div>
           </div>
 
-          <div className={`p-4 rounded-md ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <code className={isDarkMode ? 'text-green-400' : 'text-green-600'}>
+          <div className="p-4 rounded-lg border border-[var(--stroke)] bg-[var(--panel)]">
+            <code className="command-code block">
               player_stats {selectedStat} set {statValue}
             </code>
           </div>
 
           <button
             onClick={handleStatCommand}
-            className={`w-full p-3 rounded-md font-medium transition-colors ${
-              copiedCommand
-                ? 'bg-green-500 text-white'
-                : isDarkMode
-                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
+            className={`w-full btn-accent ${copiedCommand ? 'is-success' : ''}`}
           >
             {copiedCommand ? 'Copied!' : 'Copy Command'}
           </button>
         </div>
       </CommandSection>
 
-      <CommandSection title="God Mode" isDarkMode={isDarkMode}>
-        <button
-          onClick={() => handleCopyCommand('god_mode')}
-          className={`w-full p-3 rounded-md ${
-            isDarkMode
-              ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-          }`}
-        >
-          god_mode
-        </button>
-      </CommandSection>
-
-      <CommandSection title="No Clip" isDarkMode={isDarkMode}>
-        <button
-          onClick={() => handleCopyCommand('noclip')}
-          className={`w-full p-3 rounded-md ${
-            isDarkMode
-              ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-          }`}
-        >
-          noclip
-        </button>
+      <CommandSection title="Quick Toggles">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            onClick={() => handleCopyCommand('god_mode')}
+            className="btn-ghost w-full"
+          >
+            god_mode
+          </button>
+          <button
+            onClick={() => handleCopyCommand('noclip')}
+            className="btn-ghost w-full"
+          >
+            noclip
+          </button>
+        </div>
       </CommandSection>
     </div>
   );
